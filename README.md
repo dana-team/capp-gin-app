@@ -19,5 +19,5 @@ $ make test
 To build an image from this code, use:
 
 ```bash
-$ make docker-build docker-push IMG=<registry>/test-gin-app:<version>
+$ make docker-build docker-push IMG=<registry>/capp-gin-app:<version>
 ```
