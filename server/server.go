@@ -9,6 +9,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+const (
+	envKey          = "ENV-TEST"
+	envMessage      = " | env var: '%s'"
+	echoMessage     = "echoing: %s%s"
+	healthMessage   = "OK%s"
+	errNoQueryValue = "No value provided to echo"
+)
+
 // setupRouter returns a gin router.
 func setupRouter() *gin.Engine {
 	router := gin.Default()
@@ -34,15 +42,26 @@ func RunServer(quit chan os.Signal) {
 // or returns a Bad Request response if no value is provided.
 func handleEcho(c *gin.Context) {
 	echoVar := c.Query("var")
+	env, ok := os.LookupEnv(envKey)
+	message := ""
+	if ok {
+		message = fmt.Sprintf(envMessage, env)
+	}
+
 	if echoVar != "" {
-		c.String(http.StatusOK, "echoing: %s", echoVar)
+		c.String(http.StatusOK, echoMessage, echoVar, message)
 	} else {
-		c.String(http.StatusBadRequest, "No value provided to echo")
+		c.String(http.StatusBadRequest, errNoQueryValue)
 	}
 }
 
 // handleHealth handles requests to the /health endpoint.
 // It returns an OK response to indicate that the server is healthy.
 func handleHealth(c *gin.Context) {
-	c.String(http.StatusOK, "OK")
+	env, ok := os.LookupEnv(envKey)
+	message := ""
+	if ok {
+		message = fmt.Sprintf(envMessage, env)
+	}
+	c.String(http.StatusOK, healthMessage, message)
 }
